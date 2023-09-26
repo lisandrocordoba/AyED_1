@@ -27,7 +27,7 @@ class VectorTests {
 
         assertEquals(0, vector.obtener(0));
         assertEquals(5, vector.obtener(1));
-        assertEquals(98, vector.obtener(2));
+        assertEquals(98, vector.obtener(2)); 
         assertEquals(36, vector.obtener(3));
         assertEquals(90, vector.obtener(4));
 

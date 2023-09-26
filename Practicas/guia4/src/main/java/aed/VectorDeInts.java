@@ -2,55 +2,77 @@ package aed;
 
 class VectorDeInts implements SecuenciaDeInts {
     private static final int CAPACIDAD_INICIAL = 1;
-    private int _longitud;
+    private int _length;
     private int[] _array;
     private int[] _copy_array;
-
+    private VectorDeInts _copy_vector;
 
 
     public VectorDeInts() {
-        _longitud = 0;
+        _length = 0;
         _array = new int [CAPACIDAD_INICIAL];
         
     }
 
     public VectorDeInts(VectorDeInts vector) {
-
+        _length = vector.longitud();
+        _array = new int[_length];
+        for (int i = 0; i < _length; i++){
+            _array[i] = vector.obtener(i);
+        }
     }
 
     public int longitud() {
-        return _longitud;
+        return _length;
     }
 
     public void agregarAtras(int i) {
-        if (_longitud < _array.length){
-            _array[_longitud] = i;
+        if (_length < _array.length){
+            _array[_length] = i;
         }
         else {
-            _copy_array = new int [_longitud + 1];
-            for (int j = 0; j < _longitud - 1; j++){
+            // Hago una copia transitoria de _array.
+            _copy_array = new int [_length];
+            for (int j = 0; j < _length; j++){
                 _copy_array[j] = _array[j];
             }
-            _copy_array[_longitud] = i;
+            // Asigno una longitud mayor al _array, vuelvo a copiar los elementos que tenia más el nuevo al final.
+            _array = new int [_length + 1];
+            for (int j = 0; j < _length; j++){
+                _array[j] = _copy_array[j];
+            }
+            _array[_length] = i;
         }
-        _longitud ++;
+        _length ++;
         
     }
 
     public int obtener(int i) {
-        throw new UnsupportedOperationException("No implementada aun");
+        return _array[i];
     }
 
     public void quitarAtras() {
-        throw new UnsupportedOperationException("No implementada aun");
+        _length --;
+        _copy_array = new int [_length];
+        for (int j = 0; j < _length; j++){
+            _copy_array[j] = _array[j];
+        }
+        _array = new int [_length];
+        for (int j = 0; j < _length; j++){
+            _array[j] = _copy_array[j];
+        }
     }
 
     public void modificarPosicion(int indice, int valor) {
-        throw new UnsupportedOperationException("No implementada aun");
+        _array[indice] = valor; 
     }
 
     public VectorDeInts copiar() {
-        throw new UnsupportedOperationException("No implementada aun");
+        _copy_vector = new VectorDeInts();
+        for (int i = 0; i < _length; i++){
+            _copy_vector.agregarAtras(this.obtener(i));
+        }
+        return _copy_vector;
     }
 
 }
