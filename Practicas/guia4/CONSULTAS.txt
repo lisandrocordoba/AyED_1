@@ -1,0 +1,4 @@
+CONSULTAS
+
+* Guia 4: Diseño de TADs
+¿En el override de toString(), como puede ser valido retornar _sBuffer.toString() si es justamente lo que estoy codeando?

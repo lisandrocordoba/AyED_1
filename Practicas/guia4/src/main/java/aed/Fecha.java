@@ -4,7 +4,7 @@ public class Fecha {
     private int _dia;
     private int _mes;
     private StringBuffer _sBuffer;
-    private Fecha otraFecha;
+    private Fecha _otraFecha;
 
     public Fecha(int dia, int mes) {
         _dia = dia;
@@ -37,8 +37,8 @@ public class Fecha {
         if (otra.getClass() == null || otra.getClass() != this.getClass()){
             return false;
         } else {
-            otraFecha = (Fecha) otra;
-            return (_dia == otraFecha.dia() && _mes == otraFecha.mes());
+            _otraFecha = (Fecha) otra;
+            return (_dia == _otraFecha.dia() && _mes == _otraFecha.mes());
         }
     }
 

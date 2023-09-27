@@ -1,27 +1,41 @@
 package aed;
 
 public class Horario {
+    private int _hora;
+    private int _minutos;
+    private StringBuffer _sBuffer;
+    private Horario _otroHorario;
 
     public Horario(int hora, int minutos) {
-        throw new UnsupportedOperationException("No implementada aun");
+        _hora = hora;
+        _minutos = minutos;
     }
 
     public int hora() {
-        throw new UnsupportedOperationException("No implementada aun");
+        return _hora;
     }
 
     public int minutos() {
-        throw new UnsupportedOperationException("No implementada aun");
+        return _minutos;
     }
 
     @Override
     public String toString() {
-        throw new UnsupportedOperationException("No implementada aun");
+        _sBuffer = new StringBuffer();
+        _sBuffer.append(_hora);
+        _sBuffer.append(":");
+        _sBuffer.append(_minutos);
+        return _sBuffer.toString();
     }
 
     @Override
     public boolean equals(Object otro) {
-        throw new UnsupportedOperationException("No implementada aun");
+        if (otro.getClass() == null || otro.getClass() != this.getClass()){
+            return false;
+        } else {
+            _otroHorario = (Horario) otro;
+            return (_hora == _otroHorario.hora() && _minutos == _otroHorario.minutos());
+        }
     }
 
 }
