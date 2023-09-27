@@ -1,8 +1,14 @@
 package aed;
 
 public class Fecha {
+    private int _dia;
+    private int _mes;
+    private StringBuffer _sBuffer;
+    private Fecha otraFecha;
+
     public Fecha(int dia, int mes) {
-        throw new UnsupportedOperationException("No implementada aun");
+        _dia = dia;
+        _mes = mes;
     }
 
     public Fecha(Fecha fecha) {
@@ -10,24 +16,39 @@ public class Fecha {
     }
 
     public Integer dia() {
-        throw new UnsupportedOperationException("No implementada aun");
+        return _dia;
     }
 
     public Integer mes() {
-        throw new UnsupportedOperationException("No implementada aun");
+        return _mes;
     }
 
-    public String toString() {
-        throw new UnsupportedOperationException("No implementada aun");
+    @Override
+    public String toString() { 
+        _sBuffer = new StringBuffer();
+        _sBuffer.append(_dia);
+        _sBuffer.append("/");
+        _sBuffer.append(_mes);
+        return _sBuffer.toString();
     }
 
     @Override
     public boolean equals(Object otra) {
-        throw new UnsupportedOperationException("No implementada aun");
+        if (otra.getClass() == null || otra.getClass() != this.getClass()){
+            return false;
+        } else {
+            otraFecha = (Fecha) otra;
+            return (_dia == otraFecha.dia() && _mes == otraFecha.mes());
+        }
     }
 
     public void incrementarDia() {
-        throw new UnsupportedOperationException("No implementada aun");
+        if (_dia == diasEnMes(_mes)){
+            _dia = 1;
+            _mes = _mes + 1;
+        } else {
+            _dia ++;
+        }
     }
 
     private int diasEnMes(int mes) {
