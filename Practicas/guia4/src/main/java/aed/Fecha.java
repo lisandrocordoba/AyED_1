@@ -26,9 +26,7 @@ public class Fecha {
     @Override
     public String toString() { 
         _sBuffer = new StringBuffer();
-        _sBuffer.append(_dia);
-        _sBuffer.append("/");
-        _sBuffer.append(_mes);
+        _sBuffer.append(_dia + "/" + _mes);
         return _sBuffer.toString();
     }
 
@@ -45,7 +43,11 @@ public class Fecha {
     public void incrementarDia() {
         if (_dia == diasEnMes(_mes)){
             _dia = 1;
+            if(_mes == 12){
+                _mes = 1;
+            } else {
             _mes = _mes + 1;
+            }
         } else {
             _dia ++;
         }

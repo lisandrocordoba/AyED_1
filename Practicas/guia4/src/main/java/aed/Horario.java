@@ -22,9 +22,7 @@ public class Horario {
     @Override
     public String toString() {
         _sBuffer = new StringBuffer();
-        _sBuffer.append(_hora);
-        _sBuffer.append(":");
-        _sBuffer.append(_minutos);
+        _sBuffer.append(_hora + ":" + _minutos);
         return _sBuffer.toString();
     }
 
