@@ -4,14 +4,10 @@ class VectorDeInts implements SecuenciaDeInts {
     private static final int CAPACIDAD_INICIAL = 1;
     private int _length;
     private int[] _array;
-    private int[] _copy_array;
-    private VectorDeInts _copy_vector;
-
 
     public VectorDeInts() {
         _length = 0;
         _array = new int [CAPACIDAD_INICIAL];
-        
     }
 
     public VectorDeInts(VectorDeInts vector) {
@@ -31,16 +27,13 @@ class VectorDeInts implements SecuenciaDeInts {
             _array[_length] = i;
         }
         else {
-            // Hago una copia transitoria de _array.
-            _copy_array = new int [_length];
+            // Hago una copia transitoria de _array con una posicion extra.
+            int[] copyArray = new int [_length + 1];
             for (int j = 0; j < _length; j++){
-                _copy_array[j] = _array[j];
+                copyArray[j] = _array[j];
             }
-            // Asigno una longitud mayor al _array, vuelvo a copiar los elementos que tenia más el nuevo al final.
-            _array = new int [_length + 1];
-            for (int j = 0; j < _length; j++){
-                _array[j] = _copy_array[j];
-            }
+            // Apunto a la misma dirección que copyArray y agrego "i" al final.
+            _array = copyArray;
             _array[_length] = i;
         }
         _length ++;
@@ -53,14 +46,11 @@ class VectorDeInts implements SecuenciaDeInts {
 
     public void quitarAtras() {
         _length --;
-        _copy_array = new int [_length];
+        int[] copyArray = new int [_length];
         for (int j = 0; j < _length; j++){
-            _copy_array[j] = _array[j];
+            copyArray[j] = _array[j];
         }
-        _array = new int [_length];
-        for (int j = 0; j < _length; j++){
-            _array[j] = _copy_array[j];
-        }
+        _array = copyArray;
     }
 
     public void modificarPosicion(int indice, int valor) {
@@ -68,11 +58,11 @@ class VectorDeInts implements SecuenciaDeInts {
     }
 
     public VectorDeInts copiar() {
-        _copy_vector = new VectorDeInts();
+        VectorDeInts copiaVector = new VectorDeInts();
         for (int i = 0; i < _length; i++){
-            _copy_vector.agregarAtras(this.obtener(i));
+            copiaVector.agregarAtras(this.obtener(i));
         }
-        return _copy_vector;
+        return copiaVector;
     }
 
 }

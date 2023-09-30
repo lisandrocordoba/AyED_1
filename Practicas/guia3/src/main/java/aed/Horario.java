@@ -3,8 +3,6 @@ package aed;
 public class Horario {
     private int _hora;
     private int _minutos;
-    private StringBuffer _sBuffer;
-    private Horario _otroHorario;
 
     public Horario(int hora, int minutos) {
         _hora = hora;
@@ -21,9 +19,7 @@ public class Horario {
 
     @Override
     public String toString() {
-        _sBuffer = new StringBuffer();
-        _sBuffer.append(_hora + ":" + _minutos);
-        return _sBuffer.toString();
+        return (new StringBuffer(_hora + ":" + _minutos)).toString();
     }
 
     @Override
@@ -31,8 +27,8 @@ public class Horario {
         if (otro.getClass() == null || otro.getClass() != this.getClass()){
             return false;
         } else {
-            _otroHorario = (Horario) otro;
-            return (_hora == _otroHorario.hora() && _minutos == _otroHorario.minutos());
+            Horario otroHorario = (Horario) otro;
+            return (_hora == otroHorario.hora() && _minutos == otroHorario.minutos());
         }
     }
 

@@ -4,12 +4,11 @@ public class Recordatorio {
     private String _mensaje;
     private Fecha _fecha;
     private Horario _horario;
-    private StringBuffer _sBuffer;
 
     public Recordatorio(String mensaje, Fecha fecha, Horario horario) {
         _mensaje = mensaje;
         _fecha = new Fecha(fecha.dia(), fecha.mes());
-        _horario = new Horario(horario.minutos(), horario.minutos());
+        _horario = horario;
     }
 
     public Horario horario() {
@@ -17,7 +16,8 @@ public class Recordatorio {
     }
 
     public Fecha fecha() {
-        return _fecha;
+        Recordatorio recordatorioCopia = new Recordatorio(_mensaje, _fecha, _horario);
+        return recordatorioCopia._fecha;
     }
 
     public String mensaje() {
@@ -26,8 +26,9 @@ public class Recordatorio {
 
     @Override
     public String toString() {
-        _sBuffer.append(_mensaje + " @" + _fecha.toString() + " " + _horario.toString());
-        return _sBuffer.toString();
+        StringBuffer sBuffer = new StringBuffer();
+        sBuffer.append(_mensaje + " @ " + _fecha.toString() + " " + _horario.toString());
+        return sBuffer.toString();
     }
 
 }

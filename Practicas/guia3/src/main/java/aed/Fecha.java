@@ -3,8 +3,6 @@ package aed;
 public class Fecha {
     private int _dia;
     private int _mes;
-    private StringBuffer _sBuffer;
-    private Fecha _otraFecha;
 
     public Fecha(int dia, int mes) {
         _dia = dia;
@@ -12,7 +10,8 @@ public class Fecha {
     }
 
     public Fecha(Fecha fecha) {
-        throw new UnsupportedOperationException("No implementada aun");
+        _dia = fecha.dia();
+        _mes = fecha.mes();
     }
 
     public Integer dia() {
@@ -24,10 +23,8 @@ public class Fecha {
     }
 
     @Override
-    public String toString() { 
-        _sBuffer = new StringBuffer();
-        _sBuffer.append(_dia + "/" + _mes);
-        return _sBuffer.toString();
+    public String toString() {
+        return (new StringBuffer(_dia + "/" + _mes)).toString();
     }
 
     @Override
@@ -35,8 +32,8 @@ public class Fecha {
         if (otra.getClass() == null || otra.getClass() != this.getClass()){
             return false;
         } else {
-            _otraFecha = (Fecha) otra;
-            return (_dia == _otraFecha.dia() && _mes == _otraFecha.mes());
+            Fecha otraFecha = (Fecha) otra;
+            return (_dia == otraFecha.dia() && _mes == otraFecha.mes());
         }
     }
 
