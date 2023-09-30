@@ -3,22 +3,21 @@ package aed;
 import java.util.*;
 
 public class ListaEnlazada<T> implements Secuencia<T> {
-    private Nodo _primero;
-    private Nodo _ultimo;
+    private Nodo _first;
+    private Nodo _last;
     private int _size;
 
     private class Nodo {
-        T valor;
-        Nodo proximo;
-        Nodo anterior;            
-
+        T value;
+        Nodo next;
+        Nodo prev;            
         Nodo(T v){
-            valor = v;
+            value = v;
         }
     }
 
     public ListaEnlazada() {
-        _primero = null;
+        _first = null;
     }
 
     public int longitud() {
@@ -26,123 +25,154 @@ public class ListaEnlazada<T> implements Secuencia<T> {
     }
 
     public void agregarAdelante(T elem) {
-        Nodo nuevo = new Nodo(elem);
+        Nodo newNode = new Nodo(elem);
         if (_size == 0) {
-            _primero = nuevo;
-            _ultimo = nuevo;
+            _first = newNode;
+            _last = newNode;
 
         } else {
-            _primero.anterior = nuevo;
-            nuevo.proximo = _primero;
-            _primero = nuevo;
+            _first.prev = newNode;
+            newNode.next = _first;
+            _first = newNode;
         }
         _size ++;
     }
 
     public void agregarAtras(T elem) {
-        Nodo nuevo = new Nodo(elem);
+        Nodo newNode = new Nodo(elem);
         if (_size == 0){
-            _primero = nuevo;
-            _ultimo = nuevo;            
+            _first = newNode;
+            _last = newNode;            
         } else {
-            Nodo actual = _primero;
-            while(actual.proximo != null){
-                actual = actual.proximo;
+            Nodo actual = _first;
+            while(actual.next != null){
+                actual = actual.next;
             }
-            actual.proximo = nuevo;
-            nuevo.anterior = actual;
-            _ultimo = nuevo;
+            actual.next = newNode;
+            newNode.prev = actual;
+            _last = newNode;
         }
         _size ++;
     }
 
     public T obtener(int i) {
-        Nodo actual = _primero;
-        for (int j = 0; j != i; j ++){
-            actual = actual.proximo;
+        Nodo actual;
+        // Para ser mas eficiente, recorro la lista de izq a der o de der a izq dependiendo que tan grande es i con respecto a la lista.
+        if (i < (_size / 2)){
+            actual = _first;
+            for (int j = 0; j != i; j ++){
+                actual = actual.next;
+            }
+        } else {
+            actual = _last;
+            for (int j = _size - 1; j != i; j --){
+                actual = actual.prev;
+            } 
         }
-        return actual.valor;
+        return actual.value;   
     }
 
     public void eliminar(int i) {
-        Nodo actual = _primero;
+        Nodo actual = _first;
         for (int j = 0; j != i; j ++){
-            actual = actual.proximo;
+            actual = actual.next;
         }
         if(_size == 1){
-            _primero = null;
-            _ultimo = null;
-        } else if (_size == 2 && actual == _primero){
-            _ultimo.anterior = null;
-            _primero = _ultimo;
-        } else if (_size == 2 && actual == _ultimo){
-            _primero.proximo = null;
-            _ultimo = _primero;
+            _first = null;
+            _last = null;
+        // Si elimino el ultimo, el anterior apunta a null
+        } else if (i == _size - 1){
+            (actual.prev).next = null;
+            _last = actual.prev;
+        // Si elimino el primero, el proximo apunta a null (como previo)
+        } else if (i == 0){
+            (actual.next).prev = null;
+            _first = actual.next;
         } else {
-            if (i == 0){
-                (_primero.proximo).anterior = null;
-            }
-            else if (i == _size - 1){
-                (_ultimo.anterior).proximo = null;
-            } else {
-                (actual.anterior).proximo = actual.proximo;
-                (actual.proximo).anterior = actual.anterior;
-            }
+            (actual.prev).next = actual.next;
+            (actual.next).prev = actual.prev;
         }
         _size --;
-
     }
 
     public void modificarPosicion(int indice, T elem) {
-        Nodo actual = _primero;
-        for (int j = 0; j != indice; j ++){
-            actual = actual.proximo;
+        Nodo actual;
+        if (indice < (_size / 2)){
+            actual = _first;
+            for (int j = 0; j != indice; j ++){
+                actual = actual.next;
+            }
+        } else {
+            actual = _last;
+            for (int j = _size - 1; j != indice; j --){
+                actual = actual.prev;
+            } 
         }
-        actual.valor = elem;
+        actual.value = elem;
     }
 
-
     public ListaEnlazada<T> copiar() {
-        ListaEnlazada<T> copiaLista = new ListaEnlazada<T>();
-        int length = this.longitud();
-        for(int i = 0; i < length; i++){
-            copiaLista.agregarAtras(this.obtener(i));
+        ListaEnlazada<T> copyList = new ListaEnlazada<T>();
+        Nodo actual = this._first;
+        while(actual != null){
+            copyList.agregarAtras(actual.value);
+            actual = actual.next;
         }
-        return copiaLista;
+        return copyList;
     }
 
     public ListaEnlazada(ListaEnlazada<T> lista) {
-        throw new UnsupportedOperationException("No implementada aun");
+        ListaEnlazada<T> copyList = lista.copiar();
+        _first = copyList._first;
+        _last = copyList._last;
+        _size = lista._size;
     }
     
     @Override
     public String toString() {
-        throw new UnsupportedOperationException("No implementada aun");
+        StringBuffer sBuffer = new StringBuffer();
+        sBuffer.append("[");
+        Nodo actual = this._first;
+        while(actual.next != null){
+            sBuffer.append(actual.value + ", ");
+            actual = actual.next;
+        }
+        sBuffer.append(actual.value + "]");
+        return sBuffer.toString();
     }
 
     private class ListaIterador implements Iterador<T> {
-    	// Completar atributos privados
+        private int _it;
+
+        public ListaIterador(){
+            _it = 0;
+        }
 
         public boolean haySiguiente() {
-	        throw new UnsupportedOperationException("No implementada aun");
+            return (_it < _size);
         }
         
         public boolean hayAnterior() {
-	        throw new UnsupportedOperationException("No implementada aun");
+            return (_it > 0);
         }
 
         public T siguiente() {
-	        throw new UnsupportedOperationException("No implementada aun");
+            T actual = obtener(_it);
+            _it ++;
+            return (actual);
         }
         
 
         public T anterior() {
-	        throw new UnsupportedOperationException("No implementada aun");
+            _it --;
+            T actual = obtener(_it);
+            return (actual);
         }
     }
 
     public Iterador<T> iterador() {
-	    throw new UnsupportedOperationException("No implementada aun");
+        Iterador<T> iterador = new ListaIterador();
+        return iterador;
     }
 
 }
