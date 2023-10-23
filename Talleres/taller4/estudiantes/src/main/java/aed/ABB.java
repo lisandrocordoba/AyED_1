@@ -9,7 +9,6 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
     private T _max;
     private T _min;
     private int _cardinal;
-    private Nodo _last_searched;
 
     private class Nodo {
         T value;
@@ -39,14 +38,51 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
     public T maximo(){
         return _max;
     }
+///////////////// PRUEBA //////
+    private Nodo buscar_nodo(Nodo desde, T elem){
+        Boolean is_greater = (desde != null && (elem.compareTo(desde.value) > 0));
+        if (desde == null){ 
+            return null; // Si el arbol está vacio devuelve NULL
+        } else if (desde.value == elem || (desde.right == null && is_greater) || (desde.left == null && !(is_greater))){
+            return desde; // Devuelve el nodo del elemento. Si no está devuelve el que será su padre
+        } else if (elem.compareTo(desde.value) > 0){
+            return buscar_nodo(desde.right, elem);
+        } else {
+            return buscar_nodo(desde.left, elem);
+        }
+    }
 
+    public void insertar(T elem){
+        Nodo to_add = new Nodo(elem);
+        Nodo _last_searched = buscar_nodo(_origin, elem);
+        if (_last_searched == null){
+            _origin = to_add;
+            _cardinal ++;
+        } else if (_last_searched.value != elem){
+            to_add.father = _last_searched;
+            if (elem.compareTo(_last_searched.value) > 0){
+                _last_searched.right = to_add;
+            } else {
+                _last_searched.left = to_add;
+            }
+            _cardinal ++;
+        }
+        if (_max == null || elem.compareTo(_max) > 0){
+            _max = elem;
+        }
+        if (_min == null || elem.compareTo(_min) < 0){
+            _min = elem;
+        }
+    }
+    
+/*
     public void insertar(T elem){
         if (!(this.pertenece(elem))){
             Nodo to_add = new Nodo(elem);
             if (_cardinal == 0){
                 _origin = to_add;
             } else {
-                _last_searched = buscar_nodo(_origin, elem);
+                Nodo _last_searched = buscar_nodo(_origin, elem);
                 to_add.father = _last_searched;
                 if (elem.compareTo(_last_searched.value) > 0){
                     _last_searched.right = to_add;
@@ -62,8 +98,11 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
                 }
             _cardinal ++;
             }
-    }
+    } */
+///////////////// PRUEBA //////
 
+    
+    /*
     private Nodo buscar_nodo(Nodo desde, T elem){
         Nodo next;
         Boolean is_greater = (elem.compareTo(desde.value) > 0);
@@ -78,11 +117,13 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
             return buscar_nodo(next, elem);
         }
     }
-
+ */
     public boolean pertenece(T elem){
-        return busqueda_recursiva(_origin, elem);
+        Nodo searched = buscar_nodo(_origin, elem);
+        return (!(searched == null || searched.value != elem));
     }
 
+    /*
     private boolean busqueda_recursiva(Nodo desde, T elem){
         Nodo next;
         if (desde == null){
@@ -98,9 +139,9 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
             return busqueda_recursiva(next, elem);
         }
     }
-
+ */
     public void eliminar(T elem){
-        throw new UnsupportedOperationException("No implementada aun");
+        
     }
 
     public String toString(){
