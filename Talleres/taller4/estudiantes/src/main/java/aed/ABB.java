@@ -43,13 +43,11 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
     public void insertar(T elem){
         if (!(this.pertenece(elem))){
             Nodo to_add = new Nodo(elem);
-
             if (_cardinal == 0){
                 _origin = to_add;
             } else {
                 _last_searched = buscar_nodo(_origin, elem);
                 to_add.father = _last_searched;
-
                 if (elem.compareTo(_last_searched.value) > 0){
                     _last_searched.right = to_add;
                 } else {
@@ -66,33 +64,6 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
             }
     }
 
-
-/*
-        if (!(this.pertenece(elem))){
-            Nodo to_add = new Nodo(elem);
-            Nodo father = assign_father(_origin, elem);
-
-            to_add.father = father;
-            to_add.value = elem;
-            if (elem.compareTo(father.value) > 0){
-                father.right = to_add;
-            } else {
-                father.left = to_add;
-            }
-
-            if (_cardinal > 0){
-                if (elem.compareTo(_max) > 0){
-                    _max = elem;
-                }
-                if (elem.compareTo(_min) < 0){
-                    _min = elem;
-                }
-            }
-            _cardinal ++;
-            
-        } 
-    } 
- */
     private Nodo buscar_nodo(Nodo desde, T elem){
         Nodo next;
         Boolean is_greater = (elem.compareTo(desde.value) > 0);
@@ -108,14 +79,13 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
         }
     }
 
-
     public boolean pertenece(T elem){
         return busqueda_recursiva(_origin, elem);
     }
 
     private boolean busqueda_recursiva(Nodo desde, T elem){
         Nodo next;
-        if (desde.value == null){
+        if (desde == null){
             return false;
         } else if (desde.value == elem){
             return true;
@@ -128,19 +98,6 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
             return busqueda_recursiva(next, elem);
         }
     }
-
-/*
-        while (actual.left != null && actual.right != null && res == false){ //// MODULARIZAR
-            if (elem.compareTo(actual.value) > 0){
-                actual = actual.right;
-            } else {
-                actual = actual.left;
-            }
-            res = (actual.value == elem);
-        }
-        return res;
-    }
- */
 
     public void eliminar(T elem){
         throw new UnsupportedOperationException("No implementada aun");
