@@ -154,85 +154,205 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
         return buscar_nodo(desde.left, elem);
     }
 }
+*/
 
     public void eliminar(T elem){
-        eliminar_recursivo(_origin, elem);
-    }
+        Nodo to_delete = buscar_nodo(_origin, elem);
+        if (to_delete != null && to_delete.value == elem){ // Chequeo si el elemento pertenece
+            Nodo father = to_delete.father;
+            Nodo right = to_delete.right;
+            Nodo left = to_delete.left;
+            Boolean is_origin = (elem == _origin.value);
 
-    public void eliminar_recursivo(Nodo desde, T elem){
-        if(desde != null){ // Caso base es desde == null y no hace nada
-            if (desde.value == elem){
-                if ()
+            // Actualizo min y max (si corresponde)
+            if (to_delete.value == _max){
+                if(!(is_origin)){
+                    _max = to_delete.father.value;
+                } else if (_cardinal > 1){
+                    _max = search_predecessor(to_delete).value;
+                } else {
+                    _max = null;
+                }
             }
-            Boolean is_greater = (elem.compareTo(desde.value) > 0);
+            if (to_delete.value == _min){
+                if(!(is_origin)){
+                    _min = to_delete.father.value;
+                } else if (_cardinal > 1){
+                    _min = search_successor(to_delete).value;
+                } else {
+                    _min = null;
+                }
+            }
+            // CASO SIN HIJOS
+            if (to_delete.right == null && to_delete.left == null){ 
+                if (is_origin){ // Si es la raiz
+                    _origin = null;
+                } else { // Si no es la raiz
+                    if (elem.compareTo(father.value) > 0){
+                        father.right = null;
+                    } else {
+                        father.left = null;
+                    }
+                }
+                to_delete = null;
 
+                // CASO 1 HIJO (derecho)
+            } else if (to_delete.left == null){ 
+                if (is_origin){ // Si es la raiz
+                    _origin = to_delete.right;
+                } else { // Si no es la raiz
+                    if (elem.compareTo(father.value) > 0){
+                        father.right = to_delete.right;
+                    } else {
+                        father.left = to_delete.left;
+                    }
+                }
+                right.father = father;
+                to_delete = null;
+
+                // CASO 1 HIJO (izquierdo)
+            } else if (to_delete.right == null){ 
+                if (is_origin){ // Si es la raiz
+                    _origin = to_delete.left;
+                } else { // Si no es la raiz
+                    if (elem.compareTo(father.value) > 0){
+                        father.left = to_delete.left;
+                    } else {
+                        father.left = to_delete.left;
+                    }
+                }
+                left.father = father;
+                to_delete = null;
+
+                // CASO 2 HIJOS
+            } else {
+                Nodo successor = search_successor(to_delete);
+                if (elem == _origin.value){
+                    this.eliminar(successor.value); // Elimino del arbol al nodo original del sucesor
+                    to_delete.value = successor.value;
+                    _cardinal ++;
+                } else {
+                    if (elem.compareTo(father.value) > 0){
+                        this.eliminar(successor.value); // Elimino del arbol al nodo original del sucesor
+                        _cardinal ++;
+                        to_delete.value = successor.value; // Copio el sucesor en el nodo a borrar
+                        /*
+                        (successor.right).father = successor.father; // Elimino del arbol al nodo original del sucesor
+                        (successor.father).left = successor.right;
+                        successor = null; // Elimino el nodo original del sucesor
+                        */
+                    } else {
+                        Nodo predecessor = search_predecessor(to_delete);
+                        this.eliminar(predecessor.value); // Elimino del arbol al nodo original del predecesor
+                        _cardinal ++;
+                        to_delete.value = predecessor.value; // Copio el predecesor en el nodo a borrar
+                        /*
+                        (predecessor.left).father = predecessor.father; // Elimino del arbol al nodo original del predecesor
+                        (predecessor.father).right = predecessor.left;
+                        predecessor = null; // Elimino el nodo original del predecesor
+                        */
+                    }
+                }    
+            }
+            _cardinal --;
         }
     }
- */
 
 
+/*
     public void eliminar(T elem){
         // VER ELIMINAR RAIZ
         Nodo to_delete = buscar_nodo(_origin, elem);
-        if (to_delete != null){
-            int right_left = elem.compareTo(to_delete.father.value); //( r_l > 0 si elem > su padre) / (r_l < 0 si elem < su padre)
-            if (to_delete.right != null && to_delete.left != null){ // CASO 3
-                if (right_left > 0){
-                    Nodo sucessor = search_successor(to_delete);
-                    
-                } else {
-                    Nodo predecessor = search_predecessor(to_delete);
+        if (to_delete != null && to_delete.value == elem){ // Chequeo si el elemento pertenece
+            if(to_delete.value != _origin.value){
+                int right_left = elem.compareTo(to_delete.father.value); // Mayor a 0 si elem está en la rama der de su padre. Menor a 0 si está en la izq
+                
+                if (to_delete.right != null && to_delete.left != null){ // CASO 2 HIJOS
+                    if (right_left > 0){
+                        Nodo sucessor = search_successor(to_delete);
+                        this.eliminar(sucessor.value);
+                        to_delete.value = sucessor.value;
+                    } else {
+                        Nodo predecessor = search_predecessor(to_delete);
+                        this.eliminar(predecessor.value);
+                        to_delete.value = predecessor.value;
+                    }
+                    _cardinal ++; // Para mantener el cardinal al borrar el suc/pred
 
-                }     
-            } else if (to_delete.right != null){ // CASO 2
-                if (right_left > 0){
-                    (to_delete.father).right = to_delete.right;
+
+                } else if (to_delete.right != null){ // CASO 1 HIJO (DERECHO)
+                    if (right_left > 0){
+                        (to_delete.father).right = to_delete.right;
+                    } else {
+                        (to_delete.father).left = to_delete.right;
+                    }
                     (to_delete.right).father = to_delete.father;
-                } else {
-                    (to_delete.father).left = to_delete.right;
-                    (to_delete.right).father = to_delete.father;
-                }     
-            } else if (to_delete.left != null){ // CASO 2
-                if (right_left > 0){
-                    (to_delete.father).right = to_delete.left;
+                    to_delete = null;
+
+                } else if (to_delete.left != null){ // CASO 1 HIJO (IZQUIERDO)
+                    if (right_left > 0){
+                        (to_delete.father).right = to_delete.right;
+                    } else {
+                        (to_delete.father).left = to_delete.right;
+                    }
                     (to_delete.left).father = to_delete.father;
-                } else {
-                    (to_delete.father).left = to_delete.left;
-                    (to_delete.left).father = to_delete.father;
-                }     
-            } else { // CASO 1
-                if (right_left > 0){
-                    (to_delete.father).right = null;
-                } else {
-                    to_delete.father.left = null;
+                    to_delete = null;
+
+                } else { // CASO SIN HIJOS
+                    if (right_left > 0){
+                        (to_delete.father).right = null;
+                    } else {
+                        to_delete.father.left = null;
+                    }
+                    to_delete = null;
                 }
-                to_delete.father = null; /// VER ALIASING
             }
             _cardinal --;
             //////////// VER MAXIMOS Y MINIMOS!!!!!
         }
     }
-
-    private Nodo search_succesor(Nodo actual){
-        actual = actual.right;
-        while(actual.left != null){
-            actual = actual.left; /// VER ALIASING
+ */
+    private Nodo search_successor(Nodo actual){
+        Nodo successor = actual.right;
+        while(successor.left != null){
+            successor = successor.left; 
         }
-        return actual;
+        return successor;
     }
 
-    private Nodo search_predecesor(Nodo actual){
-        actual = actual.left;
-        while(actual.right != null){
-            actual = actual.right; /// VER ALIASING
+    private Nodo search_predecessor(Nodo actual){
+        Nodo predecessor = actual.left;
+        while(predecessor.right != null){
+           predecessor = predecessor.right;
         }
-        return actual;
+        return predecessor;
     }
- 
+
     public String toString(){
-        throw new UnsupportedOperationException("No implementada aun");
+        StringBuffer sBuffer = new StringBuffer(); // VER creo un sbuffer por cada recursion
+        sBuffer = sBuffer.append("{");
+        sBuffer = sBuffer.append(toString_recursivo(sBuffer, _origin));
+        sBuffer = sBuffer.append("}");
+        return sBuffer.toString();
     }
 
+    private String toString_recursivo(StringBuffer sBuffer, Nodo origin){
+        StringBuffer tempBuffer = new StringBuffer();
+        if (origin.left == null && origin.right == null){
+            return origin.value.toString();
+        } else if (origin.right == null){
+            tempBuffer = tempBuffer.append(toString_recursivo(sBuffer, origin.left) + "," + origin.value);
+            return(tempBuffer.toString());
+        } else if (origin.left == null){
+            tempBuffer = tempBuffer.append(origin.value + "," + toString_recursivo(sBuffer, origin.left));
+            return(tempBuffer.toString());
+        } else {  
+            tempBuffer = tempBuffer.append(toString_recursivo(sBuffer, origin.left));
+            tempBuffer = tempBuffer.append("," + origin.value + ",");
+            tempBuffer = tempBuffer.append(toString_recursivo(sBuffer, origin.right));
+            return tempBuffer.toString();
+        }
+    }
     private class ABB_Iterador implements Iterador<T> {
         private Nodo _actual;
 

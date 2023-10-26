@@ -145,7 +145,7 @@ class ABBTests {
         assertEquals(4, conjunto.minimo());
         assertEquals(25, conjunto.maximo());
     }
-
+ 
     @Test
     void eliminar_elemento_con_sucesor_arriba() {
         ABB<Integer> conjunto = new ABB<Integer>();
@@ -270,6 +270,6 @@ class ABBTests {
         }
 
     }
-
+ 
 
 }
