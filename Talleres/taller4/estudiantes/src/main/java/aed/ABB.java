@@ -165,26 +165,10 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
             Boolean is_origin = (elem == _origin.value);
 
             // Actualizo min y max (si corresponde)
-            if (to_delete.value == _max){
-                if(!(is_origin)){
-                    _max = to_delete.father.value;
-                } else if (_cardinal > 1){
-                    _max = search_predecessor(to_delete).value;
-                } else {
-                    _max = null;
-                }
-            }
-            if (to_delete.value == _min){
-                if(!(is_origin)){
-                    _min = to_delete.father.value;
-                } else if (_cardinal > 1){
-                    _min = search_successor(to_delete).value;
-                } else {
-                    _min = null;
-                }
-            }
+            update_min_max(to_delete, is_origin);
+
             // CASO SIN HIJOS
-            if (to_delete.right == null && to_delete.left == null){ 
+            if (right == null && left == null){ 
                 if (is_origin){ // Si es la raiz
                     _origin = null;
                 } else { // Si no es la raiz
@@ -197,28 +181,28 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
                 to_delete = null;
 
                 // CASO 1 HIJO (derecho)
-            } else if (to_delete.left == null){ 
+            } else if (left == null){ 
                 if (is_origin){ // Si es la raiz
-                    _origin = to_delete.right;
+                    _origin = right;
                 } else { // Si no es la raiz
                     if (elem.compareTo(father.value) > 0){
-                        father.right = to_delete.right;
+                        father.right = right;
                     } else {
-                        father.left = to_delete.left;
+                        father.left = left;
                     }
                 }
                 right.father = father;
                 to_delete = null;
 
                 // CASO 1 HIJO (izquierdo)
-            } else if (to_delete.right == null){ 
+            } else if (right == null){ 
                 if (is_origin){ // Si es la raiz
-                    _origin = to_delete.left;
+                    _origin = left;
                 } else { // Si no es la raiz
                     if (elem.compareTo(father.value) > 0){
-                        father.left = to_delete.left;
+                        father.left = left;
                     } else {
-                        father.left = to_delete.left;
+                        father.left = left;
                     }
                 }
                 left.father = father;
@@ -233,28 +217,38 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
                     _cardinal ++;
                 } else {
                     if (elem.compareTo(father.value) > 0){
-                        this.eliminar(successor.value); // Elimino del arbol al nodo original del sucesor
-                        _cardinal ++;
                         to_delete.value = successor.value; // Copio el sucesor en el nodo a borrar
-                        /*
-                        (successor.right).father = successor.father; // Elimino del arbol al nodo original del sucesor
-                        (successor.father).left = successor.right;
-                        successor = null; // Elimino el nodo original del sucesor
-                        */
+                        this.eliminar(successor.value); // Elimino del arbol al nodo original del sucesor
                     } else {
                         Nodo predecessor = search_predecessor(to_delete);
                         this.eliminar(predecessor.value); // Elimino del arbol al nodo original del predecesor
                         _cardinal ++;
                         to_delete.value = predecessor.value; // Copio el predecesor en el nodo a borrar
-                        /*
-                        (predecessor.left).father = predecessor.father; // Elimino del arbol al nodo original del predecesor
-                        (predecessor.father).right = predecessor.left;
-                        predecessor = null; // Elimino el nodo original del predecesor
-                        */
                     }
                 }    
             }
             _cardinal --;
+        }
+    }
+
+    private void update_min_max(Nodo to_delete, Boolean is_origin){
+        if (to_delete.value == _max){
+            if(!(is_origin)){
+                _max = to_delete.father.value;
+            } else if (_cardinal > 1){
+                _max = search_predecessor(to_delete).value;
+            } else {
+                _max = null;
+            }
+        }
+        if (to_delete.value == _min){
+            if(!(is_origin)){
+                _min = to_delete.father.value;
+            } else if (_cardinal > 1){
+                _min = search_successor(to_delete).value;
+            } else {
+                _min = null;
+            }
         }
     }
 
@@ -356,7 +350,7 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
     private class ABB_Iterador implements Iterador<T> {
         private Nodo _actual;
 
-        public boolean haySiguiente() {            
+        public boolean haySiguiente() {
             throw new UnsupportedOperationException("No implementada aun");
         }
     
