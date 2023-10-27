@@ -224,7 +224,7 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
                         this.eliminar(predecessor.value); // Elimino del arbol al nodo original del predecesor
                         _cardinal ++;
                         to_delete.value = predecessor.value; // Copio el predecesor en el nodo a borrar
-                    }
+                    }//
                 }    
             }
             _cardinal --;
