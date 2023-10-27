@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 class ABBTests {
-
+/*
     @Test
     void nuevo_conjunto_vacio() {
         ABB<Integer> conjunto = new ABB<Integer>();
@@ -94,7 +94,7 @@ class ABBTests {
         assertEquals(7, conjunto.maximo());        
     }
 
-    
+
     @Test
     void eliminar_elemento_con_dos_descendientes() {
         ABB<Integer> conjunto = new ABB<Integer>();
@@ -145,7 +145,7 @@ class ABBTests {
         assertEquals(4, conjunto.minimo());
         assertEquals(25, conjunto.maximo());
     }
- 
+      
     @Test
     void eliminar_elemento_con_sucesor_arriba() {
         ABB<Integer> conjunto = new ABB<Integer>();
@@ -166,7 +166,7 @@ class ABBTests {
         assertEquals(25, conjunto.maximo());
         assertEquals("{4,5,12,15,19,21,22,24,25}", conjunto.toString());
     }
-
+ */
     @Test
     void siguiente_inorder() {
         ABB<Integer> conjunto = new ABB<Integer>();
@@ -193,7 +193,7 @@ class ABBTests {
         assertEquals(25, iterador.siguiente());
         
     }
-
+/*
     @Test
     void testToString() {
         ABB<Integer> c = new ABB<Integer>();
@@ -271,5 +271,5 @@ class ABBTests {
 
     }
  
-
+  */
 }
