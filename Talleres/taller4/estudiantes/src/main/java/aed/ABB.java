@@ -7,7 +7,9 @@ import java.util.*;
 public class ABB<T extends Comparable<T>> implements Conjunto<T> {
     private Nodo _raiz;
     private T _max;
+    // private T _next_max;
     private T _min;
+    // private T _next_min;
     private int _cardinal;
 
     private class Nodo {
@@ -45,7 +47,7 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
         if (_last_searched == null){
             _raiz = to_add;
             _cardinal ++;
-        } else if (_last_searched.value != elem){
+        } else if (elem.compareTo(_last_searched.value) != 0){
             to_add.father = _last_searched;
             if (elem.compareTo(_last_searched.value) > 0){
                 _last_searched.right = to_add;
@@ -57,6 +59,7 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
         if (_max == null || elem.compareTo(_max) > 0){
             _max = elem;
         }
+  
         if (_min == null || elem.compareTo(_min) < 0){
             _min = elem;
         }
@@ -64,16 +67,16 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
     
     public boolean pertenece(T elem){
         Nodo searched = buscar_nodo(_raiz, elem);
-        return (!(searched == null || searched.value != elem));
+          return (!(searched == null || elem.compareTo(searched.value) != 0));
     }
 
     private Nodo buscar_nodo(Nodo desde, T elem){
         Boolean is_greater = (desde != null && (elem.compareTo(desde.value) > 0));
         if (desde == null){ 
             return null; // Si el arbol está vacio devuelve NULL
-        } else if (desde.value == elem || (desde.right == null && is_greater) || (desde.left == null && !(is_greater))){
+        } else if (elem.compareTo(desde.value) == 0 || (desde.right == null && is_greater) || (desde.left == null && !(is_greater))){
             return desde; // Devuelve el nodo del elemento. Si no está devuelve el que sería (si se quiere agregar elem) su padre
-        } else if (elem.compareTo(desde.value) > 0){
+        } else if (is_greater){
             return buscar_nodo(desde.right, elem);
         } else {
             return buscar_nodo(desde.left, elem);
@@ -82,14 +85,15 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
 
     public void eliminar(T elem){
         Nodo to_delete = buscar_nodo(_raiz, elem);
-        if (to_delete != null && to_delete.value == elem){ // Chequeo si el elemento pertenece
+        if (to_delete != null && elem.compareTo(to_delete.value) == 0){ // Chequeo si el elemento pertenece
             Nodo father = to_delete.father;
             Nodo right = to_delete.right;
             Nodo left = to_delete.left;
-            Boolean is_raiz = (elem == _raiz.value);
+            Boolean is_raiz = (elem.compareTo(_raiz.value) == 0);
 
             // Actualizo min y max (si corresponde)
             update_min_max(to_delete, is_raiz);
+
 
             // CASO SIN HIJOS
             if (right == null && left == null){ 
@@ -112,7 +116,7 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
                     if (elem.compareTo(father.value) > 0){
                         father.right = right;
                     } else {
-                        father.left = left;
+                        father.left = right;
                     }
                 }
                 right.father = father;
@@ -124,7 +128,7 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
                     _raiz = left;
                 } else { // Si no es la raiz
                     if (elem.compareTo(father.value) > 0){
-                        father.left = left;
+                        father.right = left;
                     } else {
                         father.left = left;
                     }
@@ -134,48 +138,46 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
 
                 // CASO 2 HIJOS
             } else {
-                Nodo successor = search_successor(to_delete);
-                if (elem == _raiz.value){
+                Nodo successor = search_successor(to_delete);             
+                if (_max.compareTo(successor.value) == 0){ // VER (por ser max y sucesor, esta inmediatamente a la derecha de to_delete y no tiene hijo der ni izq)
                     to_delete.value = successor.value;
-                    if (successor.right != null){
-                        (successor.right).father = father;
-                        (successor.father).left = successor.right;
-                    }
-                    (successor.father).left = null;
+                    to_delete.right = null;
                     successor = null;
                 } else {
+                    eliminar(successor.value);
+                    _cardinal++;
                     to_delete.value = successor.value;
-                    if (successor.right != null){
-                        (successor.right).father = father;
-                        (successor.father).left = successor.right;
-                    }
-                    if (successor.value.compareTo((successor.father).value) > 0){
-                        successor.father.right = null;
-                    } else {
-                        successor.father.left = null;
-                    }
-                    successor = null;
-                }    
+                }  
             }
             _cardinal --;
         }
     }
 
     private void update_min_max(Nodo to_delete, Boolean is_raiz){
-        if (to_delete.value == _max){
+        if (_max.compareTo(to_delete.value) == 0){
+            Nodo predecessor = search_predecessor(to_delete);
             if(!(is_raiz)){
-                _max = to_delete.father.value;
+                if (predecessor != null){
+                    _max = predecessor.value;
+                } else {
+                    _max = (to_delete.father).value;
+                }
             } else if (_cardinal > 1){
-                _max = search_predecessor(to_delete).value;
+                _max = predecessor.value;
             } else {
                 _max = null;
             }
         }
-        if (to_delete.value == _min){
-            if(!(is_raiz)){
-                _min = to_delete.father.value;
+        if (_min.compareTo(to_delete.value) == 0){
+            Nodo succesor = search_successor(to_delete);
+            if (!(is_raiz)){
+                if (succesor != null){
+                    _min = succesor.value;
+                } else {
+                    _min = (to_delete.father).value;
+                }
             } else if (_cardinal > 1){
-                _min = search_successor(to_delete).value;
+                _min = succesor.value;
             } else {
                 _min = null;
             }
@@ -183,17 +185,29 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
     }
 
     private Nodo search_successor(Nodo actual){
-        Nodo successor = actual.right;
-        while(successor.left != null){
-            successor = successor.left; 
+        Nodo successor = null;
+        //Nodo actual_copy = actual;
+        if(actual != null){
+            if (actual.right != null){
+                successor = actual.right;
+                while(successor.left != null){
+                    successor = successor.left;
+                }
+            }
         }
         return successor;
     }
 
     private Nodo search_predecessor(Nodo actual){
-        Nodo predecessor = actual.left;
-        while(predecessor.right != null){
-           predecessor = predecessor.right;
+        Nodo predecessor = null;
+        //Nodo actual_copy = actual;
+        if(actual != null){
+            if (actual.left != null){
+                predecessor = actual.left;
+                while(predecessor.right != null){
+                    predecessor = predecessor.right;
+                }  
+            }  
         }
         return predecessor;
     }
@@ -227,19 +241,39 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
 
         private ABB_Iterador(){
             _actual = buscar_nodo(_raiz, _min);
-            _next = search_successor(_actual);
-        }
+            update_next(_actual);
+            }
 
         public boolean haySiguiente() {
-            return _next != null;
+            return _actual != null;
         }
     
         public T siguiente() {
+             T _actual_value = _actual.value;
             _actual = _next;
-            _next = search_successor(_actual);
-            return _actual.value;
+            update_next(_actual);
+            return _actual_value;
         }
-    }
+
+        private void update_next(Nodo actual){
+            _next = search_successor(actual);
+            if (_next == null){
+                _next = actual.father;
+                if(_next != _raiz){
+                    Nodo father = _next.father;
+                    Boolean is_right_branch = ((_next.value).compareTo(father.value) > 0);
+                    while (father != null &&  is_right_branch && (actual.value).compareTo(father.value) < 0){
+                        _next = father;
+                        father = _next.father;
+                    }
+                    if ((_next.value).compareTo(actual.value) < 0){
+                        _next = father;
+                    }
+                }
+            }        
+        }
+    }   
+
 
     public Iterador<T> iterador() {
         return new ABB_Iterador();
