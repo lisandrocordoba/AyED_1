@@ -34,7 +34,8 @@ public class InternetToolkit {
         }
          // Armo el maxHeap de router que superan el umbral
         maxHeap<Router> routersHeap = new maxHeap<Router>(superanUmbral, cuantosSuperan);
-        // Guardo los primeros k routers del maxHeap
+
+        // Guardo los primeros k routers del maxHeap en maxRouters
         Router[] maxRouters = new Router[k];
         int routersGuardados = 0;
         int i = 0;
@@ -47,7 +48,18 @@ public class InternetToolkit {
     }
 
     public IPv4Address[] sortIPv4(String[] ipv4) {
-        // IMPLEMENTAR
+        // Se que los digitos van de 0 a 9 y que un octeto a lo sumo será 255 (A lo sumo 3 dígitos).
+        ListaEnlazada<IPv4Address>[] bucket = new ListaEnlazada[10];
+        int cantIP = ipv4.length;
+        // Convierto las IPs de String a IPv4Address
+        IPv4Address[] IPs = new IPv4Address[cantIP];
+        for (int i = 0; i < cantIP; i++){
+            IPs[i] = new IPv4Address(ipv4[i]);
+        }
+        // Ordeno con radix sort
+        for (int i = 1; i <= 3; i++){
+            
+        }
         return null;
     }
 }
