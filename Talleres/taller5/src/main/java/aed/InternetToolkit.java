@@ -33,7 +33,7 @@ public class InternetToolkit {
                 cuantosSuperan ++;
             }
         }
-         // Armo el maxHeap de router que superan el umbral
+         // Armo el maxHeap de routers que superan el umbral
         maxHeap<Router> routersHeap = new maxHeap<Router>(superanUmbral, cuantosSuperan);
 
         // Guardo los primeros k routers del maxHeap en maxRouters
@@ -51,7 +51,7 @@ public class InternetToolkit {
     public IPv4Address[] sortIPv4(String[] ipv4) {
         int cantIP = ipv4.length;
 
-        // Inicializo el bucket de tamaño 10 (los digitos van de 0 a 9) y las listas en cada posicion
+        // Inicializo el bucket de tamaño 10 (los digitos van de 0 a 9) y las listas de cada posición
         ListaEnlazada<IPv4Address>[] bucket = new ListaEnlazada[10];
         for (int i = 0; i < 10; i++){
             bucket[i] = new ListaEnlazada<>();
@@ -63,26 +63,26 @@ public class InternetToolkit {
             IPs[i] = new IPv4Address(ipv4[i]);
         }
 
-        // RADIX SORT
+        // RADIX SORT -> O(12 digitos * n) = O(n) con n cantidad de IP´s
 
         // Recorre del 4to al 1er octeto
-        for (int octeto = 3; octeto >= 0; octeto--){
+        for (int octeto = 3; octeto >= 0; octeto--){  // O(1)
 
             // Recorre del 3er al 1er digito del octeto (a lo sumo tienen 3 digitos pues 255 es el maximo)
-            for (int exp = 1; exp <= 3; exp++){
+            for (int exp = 1; exp <= 3; exp++){ // O(1)
 
                 // Recorre todas las IPs y las guarda en el bucket
-                for (int i = 0; i < cantIP; i++){
+                for (int i = 0; i < cantIP; i++){ // O(n)
                     int digito = (IPs[i].getOctet(octeto) % (int)(Math.pow(10, exp))) / (int)(Math.pow(10, exp - 1));
                     bucket[digito].agregarAtras(IPs[i]);
                 }
                 
                 // Recorre el bucket
-                for (int i = 0; i < 10; i++){
-                    int ordenados = 0;
+                int ordenados = 0;
+                for (int i = 0; i < 10; i++){ // O(1)
 
                     // Recorre las listas, guardando las IPs en el array original manteniendo el orden y borrandolas del bucket
-                    while(bucket[i].longitud() > 0){
+                    while(bucket[i].longitud() > 0){ // O(n)
                         IPs[ordenados] = bucket[i].obtener(0);
                         bucket[i].eliminar(0);
                         ordenados++;
