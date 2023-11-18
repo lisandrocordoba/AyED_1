@@ -1,4 +1,5 @@
 package aed;
+import java.lang.Math;
 
 public class InternetToolkit {
     public InternetToolkit() {
@@ -48,19 +49,48 @@ public class InternetToolkit {
     }
 
     public IPv4Address[] sortIPv4(String[] ipv4) {
-        // Se que los digitos van de 0 a 9 y que un octeto a lo sumo será 255 (A lo sumo 3 dígitos).
-        ListaEnlazada<IPv4Address>[] bucket = new ListaEnlazada[10];
         int cantIP = ipv4.length;
+
+        // Inicializo el bucket de tamaño 10 (los digitos van de 0 a 9) y las listas en cada posicion
+        ListaEnlazada<IPv4Address>[] bucket = new ListaEnlazada[10];
+        for (int i = 0; i < 10; i++){
+            bucket[i] = new ListaEnlazada<>();
+        }
+        
         // Convierto las IPs de String a IPv4Address
         IPv4Address[] IPs = new IPv4Address[cantIP];
         for (int i = 0; i < cantIP; i++){
             IPs[i] = new IPv4Address(ipv4[i]);
         }
-        // Ordeno con radix sort
-        for (int i = 1; i <= 3; i++){
-            
+
+        // RADIX SORT
+
+        // Recorre del 4to al 1er octeto
+        for (int octeto = 3; octeto >= 0; octeto--){
+
+            // Recorre del 3er al 1er digito del octeto (a lo sumo tienen 3 digitos pues 255 es el maximo)
+            for (int exp = 1; exp <= 3; exp++){
+
+                // Recorre todas las IPs y las guarda en el bucket
+                for (int i = 0; i < cantIP; i++){
+                    int digito = (IPs[i].getOctet(octeto) % (int)(Math.pow(10, exp))) / (int)(Math.pow(10, exp - 1));
+                    bucket[digito].agregarAtras(IPs[i]);
+                }
+                
+                // Recorre el bucket
+                for (int i = 0; i < 10; i++){
+                    int ordenados = 0;
+
+                    // Recorre las listas, guardando las IPs en el array original manteniendo el orden y borrandolas del bucket
+                    while(bucket[i].longitud() > 0){
+                        IPs[ordenados] = bucket[i].obtener(0);
+                        bucket[i].eliminar(0);
+                        ordenados++;
+                    }
+                }
+            }
         }
-        return null;
+        return IPs;
     }
 }
 
