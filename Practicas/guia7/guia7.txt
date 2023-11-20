@@ -1,0 +1,350 @@
+DUDAS
+- Union en 8) ConjuntoNaturales
+
+
+
+
+
+
+EJERCICIO 4: Matriz Finita
+- Crear(filas, columnas)
+- Definir(fila, columna, valor), fila/columna debe ser valida // θ(n) en peor caso
+- #Filas
+- #Columnas
+- Obtener(fila, columna), fila/columna deben ser validas y si no se definio la posición dada se devuelve 0 // θ(n) en peor caso
+- SumarMatrices(m1, m2), deben ser de misma dimension // θ(n + m) en peor caso
+ 
+ n y m cantidad de elementos no nulos de A y B
+
+ //IDEA// 
+var elems: ListaEnlazada<struct<fil:int, columnas:ListaEnlazada<tupla<col:int, valor:T>>> donde voy creando la
+fila/columna a medida que sea necesario(cuando defino)
+- Cumple definir en 0(n): pues si ya esta definido lo busco en 0(n) y lo modifico en 0(1). Si no está definido
+ copio en una nueva ListaEnlazada<struct<...>> las filas/columnas hasta encontrar su lugar,
+ y luego sigo copiando hasta el final
+- Cumple obtener en 0(n) pues itero en la lista y solo tengo elementos definidos (n). Si no lo encuentro devuelvo 0
+- ¿¿Cumple SumarMatrices en 0(n)??
+
+// OTRA IDEA //
+var elems: ListaEnlazada<struct<coord:struct<fil:int, col:int>, val:T>>
+A medida que defino los valores, los voy guardando en la lista ordenados primero por Fil y luego por Col
+- Cumple definir en 0(n): Buscar su lugar y agregarlo ahi (Correr los posteriores a la derecha) es 0(n)
+  pues mientras mas me cueste encontrarlo(mas al final esté), menos corrimientos a derecha tendré que hacer
+- Cumple obtener en 0(n): pues busco el elemento en la lista y solo hay posiciones definidas. Si no lo encuentro devuelvo 0
+- Cumple SumarMatrices: 
+
+ Modulo MatrizFinitaImpl implementa MatrizFinita {
+    var elems: ListaEnlazada<ListaEnlazada<tupla<int, T>>
+ }
+
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+
+EJERCICIO 5: DiccionarioConHistoria
+
+
+Modulo DiccHistImpl<K,V> implementa DiccionarioConHistoria<K,V>{
+    var elems: DiccionarioLineal<K, V>
+    var cant: DiccionarioLineal<K, int>
+
+    proc nuevoDiccionario(): DiccHistImpl<K,V> {                    // Complejidad: O(1)
+        var res: DiccionarioConHistoria<K,V> := new DiccHistImpl<K,V>   // O(1)
+        res.elems = new DiccionarioLineal<K,V>                      // O(1)
+        res.cant = new DiccionarioLineal<K,V>                       // O(1)
+        return res
+    }
+    proc está(in d: DiccHistImpl<K,V>, in clave: K): bool{           // Complejidad: O(n)
+        var res: bool := (d.elems.está(clave))                           // O(n)
+        return res                                                   // O(1)
+    }
+    proc definir(inout d: DiccHistImpl<K,V>, in clave: K, in valor: V){  // Complejidad: O(n)
+        d.elems.definir(clave, valor)                                    // O(n)
+        if (d.cant.está(clave)){                                         // O(n)
+            d.cant.definir(clave, d.cant.obtener(clave) + 1)             // O(n)
+        } else {
+            d.cant.definir(clave, 1)                                     // O(n)
+        }
+    }
+    proc obtener(in d: DiccHistImpl<K,V>, in clave: K): V{      // Complejidad: O(n)
+        var res: V := d.elems.obtener(clave)                        // O(n)
+        return res                                              // O(1)
+    }
+    proc borrar(inout d: DiccHistImpl<K,V>, in clave: K){       // Complejidad: O(n)
+        d.elems.borrar(clave)
+    }
+    proc cantSignificados(in d: DiccHistImpl<K,V>, in clave: K): int{   // Complejidad: O(n)
+        var res: int := d.cant.obtener(clave)
+        return res
+    }
+}
+
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+
+EJERCICIO 6: DiccionarioConHistoria
+
+Nodo<T> es struct<izq: Nodo, der: Nodo, dato: T>
+
+Impl ArbolBinario<T> {
+    var raiz: Nodo<T>
+    
+    proc nivelCompleto(a: ArbolBinario<T>, n: int): bool{        // Complejidad: O(n)
+        requiere hayCaminoDeAltura(n)
+
+        return (2^n == nodosHastaNivel(a.raiz, 0, 0, n))         // O(n)
+    }
+
+    aux nodosHastaNivel(nodoActual: Nodo, nivelActual: int, nodos: int, hastaNivel: int){     // O(n) pues recorro todos los nodos en peor caso
+        if (nivelActual == hastaNivel){ 
+            return nodos;
+        } else {
+            nodos++
+            if (nodoActual.izq != null && nodoActual.der != null){
+                return (nodos + nodosHastaNivel(nodoActual.der, nivelActual + 1, nodos) + nodosHastaNivel(nodoActual.izq, nivelActual + 1, nodos))
+            } else if(nodoActual.izq != null){
+                return (nodos + nodosHastaNivel(nodoActual.izq, nivelActual + 1, nodos))
+            } else if(nodoActual.der != null){
+                return (nodos + nodosHastaNivel(nodoActual.der, nivelActual + 1, nodos))
+        }
+    }
+}
+    // Asumo puedo pedir la altura del arbol
+    proc estaCompleto(in a: ArbolBinario<T>): bool{                       // O(n) pues recorro todos los nodos
+        var res = (2^a.altura == nodosHastaNivel(a.raiz, 0, 0, a.altura))
+        return res
+
+    }
+
+    pred hayCaminoDeAltura(a: ArbolBinario<T>, n): int {
+        exists s: seq<Nodo> :: esCamino(a, s) && |s| == n
+    }
+    pred esCamino(a: ArbolBinario<T>, s: seq<Nodo>) {
+        |s| == 0 || (
+        s[0] == raiz &&
+        s[|s|-1].izq == nil &&
+        s[|s|-1].der == nil &&
+        forall i: int :: 0 <= i < |s|-1 ==> s[i].izq == s[i+1] || s[i].der == s[i+1])
+    }
+}
+
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+
+EJERCICIO 7: Cola de Prioridad
+
+A- Invariante de heaps implementado con Arbol Binario
+
+Modulo ColaPrioriConAB<T> implementa ColaPrioridad<T>{
+
+}
+
+
+B- Invariante de heaps implementado con Arreglo
+
+Modulo ColaPrioriConArray<T> implementa ColaPrioridad<T>{
+    var elems: Array<T>
+    var tamaño: int
+
+    proc nuevaColaPrioridad(): ColaPrioriConArray<T>{              // O(1)
+        var res: ColaPrioridad<T> := new ColaPrioriConArray<T>
+        res.elems := new Array<T>(0)
+        res.tamaño := 0
+        return res
+    }
+
+    proc vacia(in c: ColaPrioriConArray<T>): bool{
+        res: bool := (c.tamaño == 0)
+        return res 
+    }
+
+    proc proximo(in c: ColaPrioriConArray<T>): T{
+        res: T := c.elems[0]
+        return res
+    }
+
+    proc apilar(inout c: ColaPrioriConArray<T>, in e: T){         // Complejidad: O(n + log n) = O(n)
+        nuevoArray: Array<T> := new Array<T>(c.elems.length + 1)  // Copio el array en uno nuevo con una posición mas O(n + 1) = O(n)
+        for (i:int := 0, i < c.tamaño, i++){                      // O(n)
+            nuevoArray[i] := c.elems[i]                   // O(1)
+        }
+        nuevoArray[c.tamaño] := e       // Inserto el elemento al final
+        c.elems := nuevoArray           // O(1)
+        subir(c, c.tamaño)              // Subo el elemento hasta la posicion que le corresponda (a lo sumo la raiz) O(log n)
+        c.tamaño++
+    }
+    aux subir(inout c: ColaPrioriConArray<T>, in pos: int){
+        var indicePadre: int
+        var elem: T = c.elems[posActual]
+        posActual: int := pos
+        if (esPar(posActual)){
+            indicePadre := (posActual - 2) / 2
+        } else {
+            indicePadre := (posActual - 1) / 2
+        }
+        while (posActual > 0 && elem > c.elems[indicePadre]){     // A lo sumo subo hasta la raiz O(log n)
+            c.elems[posActual] := c.elems[indicePadre]            // Bajo el padre
+            posActual := indicePadre                              
+            if (esPar(posActual)){
+                indicePadre = (posActual - 2) / 2
+            } else {
+                indicePadre = (posActual - 1) / 2
+            }
+        }
+        c.elems[posActual] := elem                                // Inserto el elem en su posicion
+    }
+
+    proc desapilarMax(inout c: ColaPrioriConArray<T>): T{     // Complejidad: O(n + log n) = O(n)
+        res: T := c.elems[0]                                      // Guardo la raiz para retornarla
+        c.elems[0] := c.elems[c.tamaño - 1]                       // Subo el ultimo a la raiz
+        nuevoArray: Array<T> := new Array<T>(c.elems.length - 1)  // Copio el array en uno nuevo con una posición menos O(n - 1) = O(n)
+        for (i:int := 0, i < c.tamaño - 1, i++){                   // O(n)
+            nuevoArray[i] := c.elems[i]                   // O(1)
+        }
+        c.elems := nuevoArray
+        bajar(c, 0)                 (O log n)
+        c.tamaño--
+    }
+    
+    aux bajar(inout c: ColaPrioriConArray, in pos: int){  // O(log n)
+        var indiceHijoIzq: int
+        var indiceHijoDer: int
+        posActual: int := pos
+        var elem: T := c.elems[posActual]
+        while(2 * posActual + 1 < c.tamaño){       // Mientras tenga hizo izq, es decir mientras no sea hoja, a lo sumo baja hasta el final O(log n)
+            indiceHijoIzq := 2 * posActual + 1     
+            if(2 * posActual + 2 < c.tamaño){               // Si tiene hijo der y es mayor al hijo izq, intercambio con el der
+                indiceHijoDer := 2 * posActual + 2
+                if(c.elems[indiceHijoDer] > c.elems[indiceHijoIzq]){
+                    c.elems[posActual] := c.elems[indiceHijoDer]
+                    c.elems[indiceHijoDer] := elem
+                    posActual := indiceHijoDer
+                }
+            else{                                 // Si no tiene hijo der o es menor al hijo izq, intercambio con el izq
+                c.elems[posActual] := c.elems[indiceHijoIzq]
+                c.elems[indiceHijoIzq] := elem
+                posActual := indiceHijoIzq
+            }
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+
+EJERCICIO 8: ConjuntoNaturales con las sgtes operaciones
+- Agregar(e) en O(1) si el e es menor al minimo o mayor al maximo
+- Agregar(e) en O(n) en otro caso
+- union/interseccion(c1, c2) en O(1) si todos los elem de c1 son mayores que todos los de c1 (o viceversa)
+- union/interseccion(c1, c2) en O(n + m) en otro caso
+
+// IDEA //
+ListaEnlazadaOrdenada<T>
+- Cumple agregar max/min en O(1): al ser doblemente enlazada, tengo punteros tanto al maximo como al minimo
+- Cumple agregar en O(n): busco el lugar que le corresponde, a lo sumo itero hasta el anteultimo => O(n-1) = O(n)
+- Cumple union/interseccion en O(1) si el primer elemento de c1 es mayor al ultimo elemento de c2 (o viceversa),
+ pues solo debo conectar los extremos
+- Cumple union/interseccion en O(n + m) cumple pues con un iterador en cada lista, agrego el mayor actual y
+avanzo en el iterador correspondiente
+
+Modulo ConjNaturalesImpl<int> implementa ConjuntoNaturales<int>{
+    var elems: ListaEnlazada<int>
+
+    proc agregar(inout c: ConjNaturalesImpl<int>, in e: int){
+        if (c.elems.longitud() == 0){         // Si el conjunto está vacio lo agego en O(1)
+            c.agregarAdelante(e)
+        }
+        else{
+            if(e < c.elems.cabeza){           // Si es mas chico que el mínimo lo agrego en O(1)
+                c.elems.agregarAdelante(e)
+            }
+            else if(e > c.elems.ultimo){      // Si es mas grande que el maximo lo agrego en O(1)
+                c.elems.agregarAtras(e)
+            }
+            else{                             // Sino itero hasta encontrar su lugar en O(n)
+                var it: Iterador := c.elems.iterador()
+                var i: int = 0
+                while(it.siguiente < e){      // Siempre habra siguiente pues longitud != 0 y e es menor al max
+                    i++
+                }
+                c.elems := c.elems.agregarDespues(i, e)  // (*) Agrego el elemento en su posicion en O(n)
+            }
+        }
+    }
+    (*) Extiendo el Modulo ListaEnlazada<T> con una funcion que dada una lista devuelve una copia
+    pero agregando un elemento despues de un indice pasado como parametro (lo hago coloquialmente)
+    agregarDespues(in l: ListaEnlazada, in indice: int, in elem: T): ListaEnlazada<T>{
+        inicializo un res: ListaEnlazada
+        inicializo un i en 0
+        inicializo un it: Iterador 
+        mientras (i < indice) 
+            res.agregarAtras(it.siguiente())
+            aumento i
+        res.agregarAtras(elem)
+        mientras (it.haySiguiente())
+            res.agregarAtras(it.siguiente())
+    }
+    
+    proc union(in c1: ConjNaturalesImpl<int>, in c2: ConjNaturalesImpl<int>): ConjNaturalesImpl<int>{ // Complejidad: O(n + m)
+
+        if (c1.elems.ultimo() < c2.elems.primero()){  
+            UNIENDO EL ULTIMO DE C1 CON EL PRIMERO DE C2 TENGO O(1)
+            PERO ASI DEBERIA SER INOUT Y CON ALIASING       
+        }
+        if (c2.elems.ultimo() < c1.elems.primero()){  
+            IDEM. ADEMAS, COMO LAS UNO EN O(1) SIN ACCESO A LOS NODOS?                                
+        }
+        
+        res: ConjNaturalesImpl<int> = new ConjNaturalesImpl<int>  // Inicializo res O(1)
+        res.elems := new ListaEnlazada<int>
+
+        var it_1: Iterador := c1.elems.iterador()                 // Iterador c1 O(1)
+        actual_1: int
+
+        var it_2: Iterador := c2.elems.iterador()                 // Iterador c2 O(1)
+        actual_2: int
+        
+        var avanzar_1: bool := true
+        var avanzar_2: bool := true
+
+        while(it_1.haySiguiente() && it_2.haySiguiente()){     // Si me quedan elementos en ambos conjuntos, voy agregando el proximo menor
+            if (avanzar_1){                                    // Cuando termine los 3 whiles, habré recorrido cada elemento de los dos conjuntos 
+                actual_1 := it_1.siguiente()                   // O(n + m)
+            }
+            if (avanzar_2){
+                actual_2 := it_2.siguiente()
+            }
+            if(actual_1 < actual_2){
+                res.elems.agregarAtras(actual_1)
+                avanzar_1 := true
+                avanzar_2 := false
+            }
+            else if(actual2 < actual1){
+                res.elems.agregarAtras(actual_2)
+                avanzar_2 := true
+                avanzar_1 := false
+            }
+            else{
+                res.elems.agregarAtras(actual1)
+                avanzar_1 := true
+                avanzar_2 := true
+            }
+        }
+        if(actual_1 > actual_2){                           // Este If...else es pq sino me puedo perder el ultimo de uno de los dos conjuntos
+            res.elems.agregarAtras(actual_1)
+        }
+        else if(actual_2 > actual_1){
+            res.elems.agregarAtras(actual_2)
+        }
+        while(it_1.haySiguiente()){                        // Si solo me quedan elementos en un conjunto, agrego todos los que quedan
+            res.elems.agregarAtras(it_1.siguiente())
+        }
+        while(it_2.haySiguiente()){
+            res.elems.agregarAtras(it_2.siguiente())
+        }
+        return res
+    }
+}
+
+
+
