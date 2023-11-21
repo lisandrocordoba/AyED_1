@@ -1,6 +1,6 @@
 DUDAS
 - Union en 8) ConjuntoNaturales
-
+- Cota en 9)a)
 
 
 
@@ -251,7 +251,7 @@ Modulo ConjNaturalesImpl<int> implementa ConjuntoNaturales<int>{
     var elems: ListaEnlazada<int>
 
     proc agregar(inout c: ConjNaturalesImpl<int>, in e: int){
-        if (c.elems.longitud() == 0){         // Si el conjunto está vacio lo agego en O(1)
+        if (c.elems.longitud() == 0){         // Si el conjunto está vacio lo agrego en O(1)
             c.agregarAdelante(e)
         }
         else{
@@ -285,66 +285,159 @@ Modulo ConjNaturalesImpl<int> implementa ConjuntoNaturales<int>{
             res.agregarAtras(it.siguiente())
     }
     
-    proc union(in c1: ConjNaturalesImpl<int>, in c2: ConjNaturalesImpl<int>): ConjNaturalesImpl<int>{ // Complejidad: O(n + m)
+    proc union(in c1: ConjNaturalesImpl<int>, in c2: ConjNaturalesImpl<int>): ConjNaturalesImpl<int>{ 
 
-        if (c1.elems.ultimo() < c2.elems.primero()){  
+        if (c1.elems.ultimo() < c2.elems.primero()){                 // Si en c1 todos mayores que c2 (o vice) O(1)
             UNIENDO EL ULTIMO DE C1 CON EL PRIMERO DE C2 TENGO O(1)
             PERO ASI DEBERIA SER INOUT Y CON ALIASING       
-        }
-        if (c2.elems.ultimo() < c1.elems.primero()){  
+        } 
+        else if (c2.elems.ultimo() < c1.elems.primero()){  
             IDEM. ADEMAS, COMO LAS UNO EN O(1) SIN ACCESO A LOS NODOS?                                
         }
-        
-        res: ConjNaturalesImpl<int> = new ConjNaturalesImpl<int>  // Inicializo res O(1)
-        res.elems := new ListaEnlazada<int>
+        else{
+            res: ConjNaturalesImpl<int> = new ConjNaturalesImpl<int>  // Inicializo res O(1)
+            res.elems := new ListaEnlazada<int>
 
-        var it_1: Iterador := c1.elems.iterador()                 // Iterador c1 O(1)
-        actual_1: int
+            var it_1: Iterador := c1.elems.iterador()                 // Iterador c1 O(1)
+            actual_1: int
 
-        var it_2: Iterador := c2.elems.iterador()                 // Iterador c2 O(1)
-        actual_2: int
-        
-        var avanzar_1: bool := true
-        var avanzar_2: bool := true
+            var it_2: Iterador := c2.elems.iterador()                 // Iterador c2 O(1)
+            actual_2: int
+            
+            var avanzar_1: bool := true
+            var avanzar_2: bool := true
 
-        while(it_1.haySiguiente() && it_2.haySiguiente()){     // Si me quedan elementos en ambos conjuntos, voy agregando el proximo menor
-            if (avanzar_1){                                    // Cuando termine los 3 whiles, habré recorrido cada elemento de los dos conjuntos 
-                actual_1 := it_1.siguiente()                   // O(n + m)
+            while(it_1.haySiguiente() && it_2.haySiguiente()){     // Si me quedan elementos en ambos conjuntos, voy agregando el proximo menor
+                if (avanzar_1){                                    // Cuando termine los 3 whiles, habré recorrido cada elemento de los dos conjuntos 
+                    actual_1 := it_1.siguiente()                   // O(n + m)
+                }
+                if (avanzar_2){
+                    actual_2 := it_2.siguiente()
+                }
+                if(actual_1 < actual_2){
+                    res.elems.agregarAtras(actual_1)
+                    avanzar_1 := true
+                    avanzar_2 := false
+                }
+                else if(actual2 < actual1){
+                    res.elems.agregarAtras(actual_2)
+                    avanzar_2 := true
+                    avanzar_1 := false
+                }
+                else{
+                    res.elems.agregarAtras(actual1)
+                    avanzar_1 := true
+                    avanzar_2 := true
+                }
             }
-            if (avanzar_2){
-                actual_2 := it_2.siguiente()
-            }
-            if(actual_1 < actual_2){
+            if(actual_1 > actual_2){                           // Este If...else es pq sino me puedo perder el ultimo de uno de los dos conjuntos
                 res.elems.agregarAtras(actual_1)
-                avanzar_1 := true
-                avanzar_2 := false
             }
-            else if(actual2 < actual1){
+            else if(actual_2 > actual_1){
                 res.elems.agregarAtras(actual_2)
-                avanzar_2 := true
-                avanzar_1 := false
             }
-            else{
-                res.elems.agregarAtras(actual1)
-                avanzar_1 := true
-                avanzar_2 := true
+            while(it_1.haySiguiente()){                        // Si solo me quedan elementos en un conjunto, agrego todos los que quedan
+                res.elems.agregarAtras(it_1.siguiente())
+            }
+            while(it_2.haySiguiente()){
+                res.elems.agregarAtras(it_2.siguiente())
             }
         }
-        if(actual_1 > actual_2){                           // Este If...else es pq sino me puedo perder el ultimo de uno de los dos conjuntos
-            res.elems.agregarAtras(actual_1)
+        return res
+    }
+
+    proc interseccion(in c1: ConjNaturalesImpl<int>, in c2: ConjNaturalesImpl<int>): ConjNaturalesImpl<int>{
+        inicializo un iterador para c1 y otro para c2, voy comparando elemento a elemento
+        - si son iguales lo agrego y avanzo ambos iteradores
+        - si el de c1 es menor avanzo ese iterador
+        - si el de c2 es menor avanzo ese iterador
+        devuelvo res
+    }
+}
+
+Para poder usar este modulo con un tipo T distinto a Int, T debe ser comparable 
+
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+
+EJERCICIO 9: Relaciones binarias de naturales
+
+A- Los numeros estan entre 0 y 100
+
+Modulo RelacionesNatAcotImpl<int> implementa RelacionesNatAcot{
+    var relaciones: Array<Array<Bool>>
+
+    proc nuevasRelaciones(): RelacionesNatAcotImpl<int>{        // Complejidad: O(1)
+        res: RelacionesNatAcot<int> := new RelacionesNatAcotImpl<int>
+        res.relaciones = new Array<new Array<Bool>(100)>(100)   // Creo matriz de 100 x 100 => 100 * 100 * O(1) = O(1)
+        for (i: int := 0; i < 100; i++){
+            for (j: int := 0; j < 100; j++){
+                res.relaciones[i][j] = false                   // Inicializo todas en false => Idem O(1)
+            }
         }
-        else if(actual_2 > actual_1){
-            res.elems.agregarAtras(actual_2)
+    }
+    proc agregarRelacion(inout r: RelacionesNatAcotImpl<T>, a: int, b: int){ // Complejidad: O(1)
+        r.relaciones[a][b] := true
+    }
+
+    proc borrarRelacion(inout r: RelacionesNatAcotImpl<t¿T>, a: int, b: int){ // Complejidad: O(1)
+        r.relaciones[b][a] := false
+    }
+
+    proc relacionesDe(in r: RelacionesNatAcotImpl<T>, a: int): ConjuntoLineal<int>{   // Complejidad: O(1)
+        res: ConjuntoLineal<int> := new ConjuntoLineal<T>
+        for(i: int := 0; i < 100, i++){         // 100 * O(1) = O(1)
+            if(r.relaciones[a][i]){
+                res.agregarRapido(i)            // O(1) agregarRapido requiere que el elem no este en el conjunto, lo que siempre se cumplirá
+            }
         }
-        while(it_1.haySiguiente()){                        // Si solo me quedan elementos en un conjunto, agrego todos los que quedan
-            res.elems.agregarAtras(it_1.siguiente())
-        }
-        while(it_2.haySiguiente()){
-            res.elems.agregarAtras(it_2.siguiente())
+        return res
+    }
+
+    proc seRelacionanCon(in r: RelacionesNatAcotImpl<T>, a: int): ConjuntoLineal<int>{
+        res: ConjuntoLineal<int> := new ConjuntoLineal<T>
+        for(i: int := 0; i < 100, i++){         // 100 * O(1) = O(1)
+            if(r.relaciones[i][a]){
+                res.agregarRapido(i)          // O(1) agregarRapido requiere que el elem no este en el conjunto, lo que siempre se cumplirá
+            }
         }
         return res
     }
 }
 
 
+B- La cota de los numeros se da al crear la relacion
+ ¿Sería igual, pues en el proc nuevasRelaciones me pasan como parametro la cota y creo los array en base a eso?
 
+
+C- No hay cota
+
+Modulo RelacionesNatImpl<int> implementa RelacionesNat{
+    var seRelacionaCon: DiccionarioLog<int, ConjuntoLog<int>>           // Guarda los b tq claveRb
+    var tienenRelacionCon : DiccionarioLog<int, ConjuntoLog<int>>      // Guarda los b tq bRclave
+
+    proc nuevasRelaciones(): RelacionesNatImpl<int>{               // Complejidad: O(1)
+        res: RelacionesNat<int> := new RelacionesNatImpl<int>
+        res.relaciones := new DiccionarioLog<int, new ConjuntoLog<int>>   
+    }
+
+    proc agregarRelacion(inout r: RelacionesNatImpl<T>, a: int, b: int){      // Complejidad: O(log n + cp(ConjuntoLog))
+        r.seRelacionaCon.definir(a, (r.seRelacionaCon.obtener(a)).agregar(b))       // O(log n + log n + log n + cp(ConjuntoLog))
+        r.tienenRelacionCon.definir(b, (r.tienenRelacionCon.obtener(b)).agregar(a)) // O(log n + log n + log n + cp(ConjuntoLog))
+    }
+    
+    proc borrarRelacion(inout r: RelacionesNatImpl<T>, a: int, b: int){     // Complejidad: O(log n + cp(ConjuntoLog)) 
+        r.seRelacionaCon.definir(a, (r.seRelacionaCon.obtener(a)).sacar(b))       // O(log n + log n + log n + cp(ConjuntoLog))
+        r.tienenRelacionCon.definir(b, (r.tienenRelacionCon.obtener(b)).sacar(a)) // O(log n + log n + log n + cp(ConjuntoLog))
+    }
+
+    proc relacionesDe(in r: RelacionesNatImpl<T>, a: int): Conjunto<int>{     // Complejidad: O(log n)
+        res: Conjuntolog<int> := r.seRelacionaCon.obtener(a)  // O(log n)
+        return res   // O(1)
+    }
+
+    proc seRelacionanCon(in r: RelacionesNatImpl<T>, a: int): ConjuntoLineal<int>{  // Complejidad: O(log n)
+        res: Conjuntolog<int> := r.tienenRelacionCon.obtener(a)  // O(log n)
+        return res  // O(1)
+    }
+}
